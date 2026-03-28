@@ -8,16 +8,10 @@ use crate::app_widget::AppWidget;
 use crate::component::Component;
 use Action::Exit;
 use log::{error, info};
-use ratatui::crossterm::event::Event;
-use ratatui::layout::{Constraint, Direction, Layout, Rect};
-use ratatui::prelude::{Line, Stylize};
-use ratatui::symbols::border;
-use ratatui::widgets::{Block, Paragraph};
+use ratatui::layout::{Direction, Layout, Rect};
 use ratatui::{DefaultTerminal, Frame};
 use tokio::sync::mpsc::{Receiver, Sender};
 use tokio::time::interval;
-use tui_input::Input;
-use tui_input::backend::crossterm::EventHandler;
 
 pub struct App {
     ui_tx: Sender<Action>,
@@ -72,13 +66,4 @@ impl App {
         Ok(())
     }
 
-    fn update(&mut self, action: &Action) -> Option<Action> {
-        match action {
-            Action::InputReceived(evt) => {
-                self.widget.handle_key_event(evt);
-                None
-            }
-            _ => None,
-        }
-    }
 }

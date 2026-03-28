@@ -8,7 +8,6 @@ pub enum Action {
     NoOp,
     Multi(Vec<Action>),
 
-    InputReceived(Event),
     // SwitchScreen(Screen),
 
 }
