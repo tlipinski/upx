@@ -1,6 +1,5 @@
 mod values;
 mod app;
-mod input_handler;
 mod actions;
 mod app_widget;
 mod component;

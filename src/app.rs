@@ -1,10 +1,13 @@
+use futures_util::FutureExt;
+use std::time::Duration;
+use crossterm::event::EventStream;
+use futures_util::StreamExt;
 use crate::actions::Action;
-use crate::actions::Action::Init;
+use crate::actions::Action::{Init, Tick};
 use crate::app_widget::AppWidget;
 use crate::component::Component;
-use crate::input_handler::handle_input_task;
 use Action::Exit;
-use log::info;
+use log::{error, info};
 use ratatui::crossterm::event::Event;
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
 use ratatui::prelude::{Line, Stylize};
@@ -12,6 +15,7 @@ use ratatui::symbols::border;
 use ratatui::widgets::{Block, Paragraph};
 use ratatui::{DefaultTerminal, Frame};
 use tokio::sync::mpsc::{Receiver, Sender};
+use tokio::time::interval;
 use tui_input::Input;
 use tui_input::backend::crossterm::EventHandler;
 
@@ -33,7 +37,8 @@ impl App {
     }
 
     pub async fn run(mut self, terminal: &mut DefaultTerminal) -> anyhow::Result<()> {
-        tokio::spawn(handle_input_task(self.ui_tx.clone()));
+        let mut event_stream = EventStream::new();
+        let mut tick_interval = interval(Duration::from_secs_f64(1.0 / 4.0));
 
         let mut message_opt = Some(Init);
 
@@ -44,13 +49,24 @@ impl App {
                         info!("Exiting application");
                         break 'main_loop;
                     }
-                    _ => message_opt = self.update(&msg),
+                    _ => message_opt = self.widget.update(&msg),
                 }
             }
 
             terminal.draw(|frame| self.widget.render(frame, frame.area()))?;
 
-            message_opt = self.ui_rx.recv().await;
+            message_opt = tokio::select! {
+                maybe_event = event_stream.next().fuse() => match maybe_event {
+                    Some(Ok(event)) => self.widget.handle_key_event(&event),
+                    Some(Err(err)) => {
+                        error!("{err}");
+                        return Err(err.into())
+                    },
+                    None => break (),
+                },
+                ui = self.ui_rx.recv().fuse() => ui,
+                _ = tick_interval.tick() => Some(Tick),
+            };
         }
 
         Ok(())
