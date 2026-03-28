@@ -8,8 +8,7 @@ use crate::app_widget::AppWidget;
 use crate::component::Component;
 use Action::Exit;
 use log::{error, info};
-use ratatui::layout::{Direction, Layout, Rect};
-use ratatui::{DefaultTerminal, Frame};
+use ratatui::DefaultTerminal;
 use tokio::sync::mpsc::{Receiver, Sender};
 use tokio::time::interval;
 

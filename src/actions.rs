@@ -1,4 +1,3 @@
-use ratatui::crossterm::event::Event;
 
 #[derive(Debug)]
 pub enum Action {

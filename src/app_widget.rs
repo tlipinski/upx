@@ -15,7 +15,7 @@ pub struct AppWidget {
 }
 
 impl Component for AppWidget {
-    fn update(&mut self, action: &Action) -> Option<Action> {
+    fn update(&mut self, _action: &Action) -> Option<Action> {
         None
     }
 

@@ -46,7 +46,7 @@ struct Args {
 
 }
 
-async fn run(args: Args) -> Result<()> {
+async fn run(_args: Args) -> Result<()> {
     let mut terminal = ratatui::init();
 
     let app = App::new();
