@@ -14,6 +14,8 @@ use values::APP_NAME;
 
 #[tokio::main]
 async fn main() {
+    info!("Starting application");
+
     let file = OpenOptions::new()
         .create(true)
         .append(true)
@@ -26,14 +28,15 @@ async fn main() {
         .filter_level(LevelFilter::Debug)
         .init();
 
-    info!("Starting");
 
     let args = Args::parse();
 
     info!("{args:?}");
 
     match run(args).await {
-        Ok(()) => {}
+        Ok(()) => {
+            info!("Exiting application");
+        }
         Err(e) => {
             error!("{e}");
         }
@@ -47,6 +50,7 @@ struct Args {
 }
 
 async fn run(_args: Args) -> Result<()> {
+    info!("Starting TUI");
     let mut terminal = ratatui::init();
 
     let app = App::new();

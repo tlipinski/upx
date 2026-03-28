@@ -1,6 +1,7 @@
 use crate::actions::Action;
 use crate::component::Component;
-use crossterm::event::KeyCode;
+use KeyCode::{Char, Enter};
+use crossterm::event::{KeyCode, KeyModifiers};
 use ratatui::Frame;
 use ratatui::crossterm::event::Event;
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
@@ -9,6 +10,7 @@ use ratatui::symbols::border;
 use ratatui::widgets::{Block, Paragraph};
 use tui_input::Input;
 use tui_input::backend::crossterm::EventHandler;
+use crate::actions::Action::Exit;
 
 pub struct AppWidget {
     input: Input,
@@ -21,8 +23,11 @@ impl Component for AppWidget {
 
     fn handle_key_event(&mut self, event: &Event) -> Option<Action> {
         if let Event::Key(key_event) = event {
-            match key_event.code {
-                KeyCode::Enter => {
+            match (key_event.code, key_event.modifiers) {
+                (Char('c'), KeyModifiers::CONTROL) => {
+                    Some(Exit)
+                }
+                (Enter, KeyModifiers::NONE) => {
                     todo!()
                 }
                 _ => {
