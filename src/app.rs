@@ -35,8 +35,6 @@ impl App {
     pub async fn run(mut self, terminal: &mut DefaultTerminal) -> anyhow::Result<()> {
         tokio::spawn(handle_input_task(self.ui_tx.clone()));
 
-        let ui_tx = self.ui_tx.clone();
-
         let mut message_opt = Some(Init);
 
         'main_loop: loop {
@@ -46,7 +44,7 @@ impl App {
                         info!("Exiting application");
                         break 'main_loop;
                     }
-                    _ => message_opt = self.widget.update(&msg),
+                    _ => message_opt = self.update(&msg),
                 }
             }
 
@@ -60,6 +58,10 @@ impl App {
 
     fn update(&mut self, action: &Action) -> Option<Action> {
         match action {
+            Action::InputReceived(evt) => {
+                self.widget.handle_key_event(evt);
+                None
+            }
             _ => None,
         }
     }
