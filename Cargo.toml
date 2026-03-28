@@ -12,6 +12,7 @@ ratatui = "0.30.0"
 xdg = "3.0.0"
 tui-input = "0.15.0"
 tui-popup = "0.7.2"
+tui-scrollview = "0.6.2"
 log = "0.4.29"
 crossterm = { version = "0.29.0", features = ["event-stream"] }
 futures-util = "0.3.32"

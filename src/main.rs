@@ -9,6 +9,7 @@ use clap::Parser;
 use env_logger::{Builder, Target};
 use log::{LevelFilter, error, info};
 use std::fs::OpenOptions;
+use std::io::{stdin, Read};
 use crate::app::App;
 use values::APP_NAME;
 
@@ -28,12 +29,16 @@ async fn main() {
         .filter_level(LevelFilter::Debug)
         .init();
 
-
     let args = Args::parse();
 
     info!("{args:?}");
 
-    match run(args).await {
+    let mut input = String::new();
+    stdin().read_to_string(&mut input).expect("Failed to read input");
+
+    info!("{input:?}");
+
+    match run(args, &input).await {
         Ok(()) => {
             info!("Exiting application");
         }
@@ -49,11 +54,11 @@ struct Args {
 
 }
 
-async fn run(_args: Args) -> Result<()> {
+async fn run(_args: Args, stdin: &str) -> Result<()> {
     info!("Starting TUI");
     let mut terminal = ratatui::init();
 
-    let app = App::new();
+    let app = App::new(stdin);
     app.run(&mut terminal).await?;
 
     ratatui::restore();

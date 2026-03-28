@@ -19,13 +19,13 @@ pub struct App {
 }
 
 impl App {
-    pub fn new() -> Self {
+    pub fn new(input: &str) -> Self {
         let (ui_tx, ui_rx) = tokio::sync::mpsc::channel::<Action>(100);
 
         App {
             ui_tx,
             ui_rx,
-            widget: Box::new(AppWidget::new()),
+            widget: Box::new(AppWidget::new(input)),
         }
     }
 
