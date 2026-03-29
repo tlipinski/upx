@@ -58,7 +58,7 @@ impl App {
                     None => break (),
                 },
                 ui = self.ui_rx.recv().fuse() => ui,
-                _ = tick_interval.tick() => Some(Tick),
+                // _ = tick_interval.tick() => Some(Tick),
             };
         }
 

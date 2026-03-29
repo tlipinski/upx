@@ -4,7 +4,7 @@ version = "0.0.0"
 edition = "2024"
 
 [dependencies]
-tokio = { version = "1.50.0", features = ["rt", "rt-multi-thread", "macros", "fs", "sync", "time"] }
+tokio = { version = "1.50.0", features = ["rt", "rt-multi-thread", "macros", "fs", "sync", "time", "io-std"] }
 anyhow = "1.0.102"
 clap = { version = "4.6.0", features = ["derive"] }
 env_logger = "0.11.10"

@@ -10,6 +10,9 @@ use env_logger::{Builder, Target};
 use log::{LevelFilter, error, info};
 use std::fs::OpenOptions;
 use std::io::{stdin, Read};
+use std::os::fd::{AsFd, BorrowedFd};
+use tokio::io;
+use tokio::io::AsyncRead;
 use crate::app::App;
 use values::APP_NAME;
 
@@ -34,7 +37,7 @@ async fn main() {
     info!("{args:?}");
 
     let mut input = String::new();
-    stdin().read_to_string(&mut input).expect("Failed to read input");
+    // stdin().read_to_string(&mut input).expect("Failed to read input");
 
     info!("{input:?}");
 
