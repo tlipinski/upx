@@ -1,9 +1,10 @@
+use std::iter;
 use crate::actions::Action;
 use crate::actions::Action::Exit;
 use crate::component::Component;
 use KeyCode::{Char, Enter};
 use crossterm::event::{KeyCode, KeyModifiers};
-use log::info;
+use log::{debug, info};
 use ratatui::Frame;
 use ratatui::crossterm::event::Event;
 use ratatui::layout::{Constraint, Direction, Layout, Rect, Size};
@@ -31,6 +32,16 @@ impl Component for AppWidget {
                 (Char('c'), KeyModifiers::CONTROL) => Some(Exit),
                 (Enter, KeyModifiers::NONE) => {
                     todo!()
+                }
+                (KeyCode::Down, KeyModifiers::NONE) => {
+                    info!("Scrolling down");
+                    self.state.scroll_down();
+                    None
+                }
+                (KeyCode::Up, KeyModifiers::NONE) => {
+                    info!("Scrolling up");
+                    self.state.scroll_up();
+                    None
                 }
                 _ => {
                     self.input.handle_event(event);
@@ -62,14 +73,25 @@ impl Component for AppWidget {
         let paragraph = Paragraph::new("aaaaaaaaaaaa\nbbbbbbbbbb\ncccccccccccc")
             .block(Block::bordered().title(" Output ").border_set(border::PLAIN));
 
-        // let mut scroll_view = ScrollView::new(layout[1].as_size());
+        let content =
+            iter::repeat("Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n")
+                .take(100)
+                .collect::<String>();
 
-        info!("{:?}", area);
-        info!("{:?}", layout[0]);
-        info!("{:?}", layout[1]);
+        debug!("---");
+        debug!("{:?}", area);
+        debug!("{:?}", layout[0]);
+        debug!("{:?}", layout[1]);
 
-        // frame.render_stateful_widget(scroll_view, layout[1], &mut self.state);
-        frame.render_widget(paragraph, layout[1]);
+        let content_size = Size::new(100, 30);
+        let mut scroll_view = ScrollView::new(content_size);
+
+        let line_numbers = (1..=100).map(|i| format!("{:>3} ", i)).collect::<String>();
+        scroll_view.render_widget(Paragraph::new(line_numbers), Rect::new(0, 0, 5, 100));
+        scroll_view.render_widget(Paragraph::new(content), Rect::new(5, 0, 95, 100));
+
+        debug!("{:?}", self.state);
+        frame.render_stateful_widget(scroll_view, layout[1], &mut self.state);
 
     }
 }

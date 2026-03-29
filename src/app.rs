@@ -3,6 +3,7 @@ use std::time::Duration;
 use crossterm::event::EventStream;
 use futures_util::StreamExt;
 use crate::actions::Action;
+use color_eyre::Result;
 use crate::actions::Action::{Init, Tick};
 use crate::app_widget::AppWidget;
 use crate::component::Component;
@@ -29,7 +30,7 @@ impl App {
         }
     }
 
-    pub async fn run(mut self, terminal: &mut DefaultTerminal) -> anyhow::Result<()> {
+    pub async fn run(mut self, terminal: &mut DefaultTerminal) -> Result<()> {
         let mut event_stream = EventStream::new();
         let mut tick_interval = interval(Duration::from_secs_f64(1.0 / 4.0));
 

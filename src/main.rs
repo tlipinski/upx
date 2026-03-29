@@ -4,7 +4,7 @@ mod actions;
 mod app_widget;
 mod component;
 
-use anyhow::Result;
+use color_eyre::Result;
 use clap::Parser;
 use env_logger::{Builder, Target};
 use log::{LevelFilter, error, info};
@@ -19,6 +19,8 @@ use values::APP_NAME;
 #[tokio::main]
 async fn main() {
     info!("Starting application");
+
+    color_eyre::install().unwrap();
 
     let file = OpenOptions::new()
         .create(true)
