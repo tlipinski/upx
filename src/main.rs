@@ -7,10 +7,11 @@ mod app_widget;
 use color_eyre::Result;
 use clap::Parser;
 use env_logger::{Builder, Target};
-use log::{LevelFilter, error, info};
+use log::{LevelFilter, error, info, debug};
 use std::fs::OpenOptions;
 use std::io::{stdin, Read};
 use std::os::fd::{AsFd, BorrowedFd};
+use crossterm::tty::IsTty;
 use tokio::io;
 use tokio::io::AsyncRead;
 use crate::app::App;
@@ -38,10 +39,15 @@ async fn main() {
 
     info!("{args:?}");
 
-    let mut input = String::new();
-    stdin().read_to_string(&mut input).expect("Failed to read input");
+    let tty = io::stdin().is_tty();
 
-    info!("{input:?}");
+    debug!("tty? {:?}", tty);
+
+    let mut input = String::new();
+
+    if (!stdin().is_tty()) {
+        stdin().read_to_string(&mut input).expect("Failed to read input");
+    }
 
     match run(args, &input).await {
         Ok(()) => {
