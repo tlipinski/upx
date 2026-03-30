@@ -39,7 +39,7 @@ impl App {
             while let Some(msg) = message_opt {
                 match msg {
                     Exit => {
-                        info!("Exiting application");
+                        info!("Stopping loop");
                         break 'main_loop;
                     }
                     _ => message_opt = self.widget.update(&msg),
