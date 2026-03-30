@@ -39,14 +39,16 @@ async fn main() {
 
     info!("{args:?}");
 
-    let tty = io::stdin().is_tty();
-
-    debug!("tty? {:?}", tty);
 
     let mut input = String::new();
 
-    if (!stdin().is_tty()) {
+    let tty = io::stdin().is_tty();
+    debug!("tty? {tty}");
+    if !tty {
+        debug!("reading input");
         stdin().read_to_string(&mut input).expect("Failed to read input");
+    } else {
+        debug!("skipping input");
     }
 
     match run(args, &input).await {
