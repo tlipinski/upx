@@ -1,6 +1,5 @@
 use crate::actions::Action;
 use crate::actions::Action::Exit;
-use crate::component::Component;
 use KeyCode::{Char, Down, Enter, PageDown, PageUp, Up};
 use crossterm::event::{KeyCode, KeyModifiers};
 use log::{debug, info};
@@ -21,12 +20,12 @@ pub struct AppWidget {
     state: ScrollViewState,
 }
 
-impl Component for AppWidget {
-    fn update(&mut self, _action: &Action) -> Option<Action> {
+impl AppWidget {
+    pub fn update(&mut self, _action: &Action) -> Option<Action> {
         None
     }
 
-    fn handle_key_event(&mut self, event: &Event) -> Option<Action> {
+    pub fn handle_key_event(&mut self, event: &Event) -> Option<Action> {
         if let Event::Key(key_event) = event {
             match (key_event.code, key_event.modifiers) {
                 (Char('c'), KeyModifiers::CONTROL) => Some(Exit),
@@ -59,7 +58,7 @@ impl Component for AppWidget {
         }
     }
 
-    fn render(&mut self, frame: &mut Frame, area: Rect) {
+    pub fn render(&mut self, frame: &mut Frame, area: Rect) {
         let layout = Layout::default()
             .direction(Direction::Vertical)
             .constraints(vec![Constraint::Length(3), Constraint::Fill(1)])
@@ -74,12 +73,6 @@ impl Component for AppWidget {
         let x = self.input.visual_cursor();
         frame.set_cursor_position((area.x + (x + 1) as u16, area.y + 1));
         frame.render_widget(input, layout[0]);
-
-        debug!("---");
-        debug!("{:?}", area);
-        debug!("{:?}", layout[0]);
-        debug!("{:?}", layout[1]);
-
 
         let lines = self.content.lines().collect::<Vec<_>>().iter().len();
         debug!("lines: {}", lines);
@@ -97,9 +90,7 @@ impl Component for AppWidget {
 
         scroll_view.render(layout[1], frame.buffer_mut(), &mut self.state);
     }
-}
 
-impl AppWidget {
     pub fn new(input: &str) -> Self {
         Self {
             input: Input::from(""),

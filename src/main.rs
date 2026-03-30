@@ -4,8 +4,6 @@ mod values;
 mod app;
 mod actions;
 mod app_widget;
-mod component;
-
 use color_eyre::Result;
 use clap::Parser;
 use env_logger::{Builder, Target};

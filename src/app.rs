@@ -6,7 +6,6 @@ use crate::actions::Action;
 use color_eyre::Result;
 use crate::actions::Action::{Init, Tick};
 use crate::app_widget::AppWidget;
-use crate::component::Component;
 use Action::Exit;
 use log::{error, info};
 use ratatui::DefaultTerminal;
@@ -16,7 +15,7 @@ use tokio::time::interval;
 pub struct App {
     ui_tx: Sender<Action>,
     ui_rx: Receiver<Action>,
-    widget: Box<dyn Component>,
+    widget: AppWidget
 }
 
 impl App {
@@ -26,7 +25,7 @@ impl App {
         App {
             ui_tx,
             ui_rx,
-            widget: Box::new(AppWidget::new(input)),
+            widget: AppWidget::new(input),
         }
     }
 
