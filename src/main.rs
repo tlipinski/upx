@@ -1,3 +1,5 @@
+#[allow(unused)]
+
 mod values;
 mod app;
 mod actions;
@@ -39,7 +41,7 @@ async fn main() {
     info!("{args:?}");
 
     let mut input = String::new();
-    // stdin().read_to_string(&mut input).expect("Failed to read input");
+    stdin().read_to_string(&mut input).expect("Failed to read input");
 
     info!("{input:?}");
 

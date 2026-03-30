@@ -1,20 +1,19 @@
-use std::iter;
 use crate::actions::Action;
 use crate::actions::Action::Exit;
 use crate::component::Component;
-use KeyCode::{Char, Enter};
+use KeyCode::{Char, Down, Enter, PageDown, PageUp, Up};
 use crossterm::event::{KeyCode, KeyModifiers};
 use log::{debug, info};
-use ratatui::prelude::StatefulWidget;
 use ratatui::Frame;
 use ratatui::crossterm::event::Event;
 use ratatui::layout::{Constraint, Direction, Layout, Rect, Size};
+use ratatui::prelude::StatefulWidget;
 use ratatui::prelude::{Line, Stylize};
 use ratatui::symbols::border;
 use ratatui::widgets::{Block, Borders, Paragraph, ScrollbarState};
 use tui_input::Input;
 use tui_input::backend::crossterm::EventHandler;
-use tui_scrollview::{ScrollView, ScrollViewState};
+use tui_scrollview::{ScrollView, ScrollViewState, ScrollbarVisibility};
 
 pub struct AppWidget {
     input: Input,
@@ -34,19 +33,19 @@ impl Component for AppWidget {
                 (Enter, KeyModifiers::NONE) => {
                     todo!()
                 }
-                (KeyCode::Down, KeyModifiers::NONE) => {
+                (Down, KeyModifiers::NONE) => {
                     self.state.scroll_down();
                     None
                 }
-                (KeyCode::PageDown, KeyModifiers::NONE) => {
-                    self.state.scroll_down();
+                (PageDown, KeyModifiers::NONE) | (Char('d'), KeyModifiers::CONTROL) => {
+                    self.state.scroll_page_down();
                     None
                 }
-                (KeyCode::Up, KeyModifiers::NONE) => {
+                (Up, KeyModifiers::NONE) => {
                     self.state.scroll_up();
                     None
                 }
-                (KeyCode::PageUp, KeyModifiers::NONE) => {
+                (PageUp, KeyModifiers::NONE) | (Char('u'), KeyModifiers::CONTROL) => {
                     self.state.scroll_page_up();
                     None
                 }
@@ -68,8 +67,7 @@ impl Component for AppWidget {
 
         let input = {
             let par = Line::from(self.input.value().bold());
-            let block = Block::bordered()
-                .border_set(border::PLAIN);
+            let block = Block::bordered().border_set(border::PLAIN);
             Paragraph::new(par).block(block)
         };
 
@@ -82,21 +80,22 @@ impl Component for AppWidget {
         debug!("{:?}", layout[0]);
         debug!("{:?}", layout[1]);
 
-        let line_numbers = (1..=100).map(|i| format!("{:>3}\n", i)).collect::<String>();
-        let content =
-            iter::repeat("Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n")
-                .take(100)
-                .collect::<String>();
 
-        let content_size = Size::new(100, 200);
+        let lines = self.content.lines().collect::<Vec<_>>().iter().len();
+        debug!("lines: {}", lines);
+        let content_size = Size::new(100, lines as u16);
         let mut scroll_view = ScrollView::new(content_size);
 
+        let line_numbers = (1..=lines).map(|i| format!("{:>3}\n", i)).collect::<String>();
+
         // the layout doesn't have to be hardcoded like this, this is just an example
-        scroll_view.render_widget(Paragraph::new(line_numbers), Rect::new(0, 0, 5, 100));
-        scroll_view.render_widget(Paragraph::new(content), Rect::new(5, 0, 95, 100));
+        scroll_view.render_widget(Paragraph::new(line_numbers), Rect::new(0, 0, 5, 200));
+        scroll_view.render_widget(
+            Paragraph::new(self.content.clone()),
+            Rect::new(5, 0, 95, 200),
+        );
 
         scroll_view.render(layout[1], frame.buffer_mut(), &mut self.state);
-
     }
 }
 
