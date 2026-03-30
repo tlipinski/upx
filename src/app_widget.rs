@@ -5,6 +5,7 @@ use crate::component::Component;
 use KeyCode::{Char, Enter};
 use crossterm::event::{KeyCode, KeyModifiers};
 use log::{debug, info};
+use ratatui::prelude::StatefulWidget;
 use ratatui::Frame;
 use ratatui::crossterm::event::Event;
 use ratatui::layout::{Constraint, Direction, Layout, Rect, Size};
@@ -34,13 +35,19 @@ impl Component for AppWidget {
                     todo!()
                 }
                 (KeyCode::Down, KeyModifiers::NONE) => {
-                    info!("Scrolling down");
+                    self.state.scroll_down();
+                    None
+                }
+                (KeyCode::PageDown, KeyModifiers::NONE) => {
                     self.state.scroll_down();
                     None
                 }
                 (KeyCode::Up, KeyModifiers::NONE) => {
-                    info!("Scrolling up");
                     self.state.scroll_up();
+                    None
+                }
+                (KeyCode::PageUp, KeyModifiers::NONE) => {
+                    self.state.scroll_page_up();
                     None
                 }
                 _ => {
@@ -70,28 +77,25 @@ impl Component for AppWidget {
         frame.set_cursor_position((area.x + (x + 1) as u16, area.y + 1));
         frame.render_widget(input, layout[0]);
 
-        let paragraph = Paragraph::new("aaaaaaaaaaaa\nbbbbbbbbbb\ncccccccccccc")
-            .block(Block::bordered().title(" Output ").border_set(border::PLAIN));
-
-        let content =
-            iter::repeat("Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n")
-                .take(100)
-                .collect::<String>();
-
         debug!("---");
         debug!("{:?}", area);
         debug!("{:?}", layout[0]);
         debug!("{:?}", layout[1]);
 
-        let content_size = Size::new(100, 30);
+        let line_numbers = (1..=100).map(|i| format!("{:>3}\n", i)).collect::<String>();
+        let content =
+            iter::repeat("Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n")
+                .take(100)
+                .collect::<String>();
+
+        let content_size = Size::new(100, 200);
         let mut scroll_view = ScrollView::new(content_size);
 
-        let line_numbers = (1..=100).map(|i| format!("{:>3} ", i)).collect::<String>();
+        // the layout doesn't have to be hardcoded like this, this is just an example
         scroll_view.render_widget(Paragraph::new(line_numbers), Rect::new(0, 0, 5, 100));
         scroll_view.render_widget(Paragraph::new(content), Rect::new(5, 0, 95, 100));
 
-        debug!("{:?}", self.state);
-        frame.render_stateful_widget(scroll_view, layout[1], &mut self.state);
+        scroll_view.render(layout[1], frame.buffer_mut(), &mut self.state);
 
     }
 }
